@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signal / DeepFake Forensics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="scanlines"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">◈</span>
+    <span class="brand-name">SIGNAL</span>
+    <span class="brand-sub">frame forensics</span>
+  </div>
+  <div class="status-pill {{ 'ok' if model_loaded else 'warn' }}">
+    <span class="dot"></span>
+    {{ 'model armed' if model_loaded else 'no checkpoint loaded' }}
+  </div>
+</header>
+
+<main class="stage">
+  <section class="intro">
+    <h1>Every face leaves a signal.<br>We read the tell.</h1>
+    <p class="lede">
+      Upload a clip. We isolate the face across the sequence, track eye-blink
+      dynamics frame by frame, and pass the temporal signature through a
+      CNN&nbsp;+&nbsp;LSTM classifier trained on Celeb-DF and DFDC.
+    </p>
+  </section>
+
+  <section class="deck">
+    <div class="panel upload-panel">
+      <div class="panel-label">01 — INPUT</div>
+      <div id="dropzone" class="dropzone">
+        <input type="file" id="fileInput" accept="video/mp4,video/avi,video/mov,video/mkv" hidden>
+        <div class="dropzone-inner">
+          <div class="dz-icon">▶</div>
+          <p class="dz-text">Drop a video, or <span class="link">browse files</span></p>
+          <p class="dz-hint">MP4 · AVI · MOV · MKV — up to 200MB</p>
+        </div>
+      </div>
+      <div id="fileInfo" class="file-info hidden">
+        <span id="fileName"></span>
+        <button id="clearFile" class="ghost-btn">clear</button>
+      </div>
+      <button id="analyzeBtn" class="primary-btn" disabled>Run analysis</button>
+    </div>
+
+    <div class="panel readout-panel">
+      <div class="panel-label">02 — FRAME STRIP</div>
+      <div id="frameStrip" class="frame-strip">
+        <div class="strip-idle">awaiting input</div>
+      </div>
+
+      <div class="panel-label">03 — VERDICT</div>
+      <div id="verdict" class="verdict idle">
+        <div class="verdict-main">
+          <span id="verdictLabel" class="verdict-label">—</span>
+          <span id="verdictConf" class="verdict-conf"></span>
+        </div>
+        <div class="verdict-bars">
+          <div class="bar-row">
+            <span class="bar-label">real</span>
+            <div class="bar-track"><div id="realBar" class="bar-fill real"></div></div>
+            <span id="realPct" class="bar-pct">0%</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">fake</span>
+            <div class="bar-track"><div id="fakeBar" class="bar-fill fake"></div></div>
+            <span id="fakePct" class="bar-pct">0%</span>
+          </div>
+        </div>
+        <div class="verdict-meta">
+          <div><span class="meta-key">frames analyzed</span><span id="metaFrames" class="meta-val">—</span></div>
+          <div><span class="meta-key">blinks detected</span><span id="metaBlinks" class="meta-val">—</span></div>
+        </div>
+        <div id="errorMsg" class="error-msg hidden"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <span>EfficientNet-B4 → Bi-LSTM → blink fusion head</span>
+</footer>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
